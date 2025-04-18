@@ -1,0 +1,25 @@
+[project]
+name = "smol-course-project"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Piero Dotti",email = "progiemmeh@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "argilla (>=2.8.0,<3.0.0)",
+    "distilabel[ollama] (>=1.5.3,<2.0.0)",
+    "datasets (>=3.5.0,<4.0.0)",
+    "transformers (>=4.51.3,<5.0.0)",
+    "torch (>=2.6.0,<3.0.0)",
+    "python-dotenv (>=1.1.0,<2.0.0)",
+    "beautifulsoup4 (>=4.13.4,<5.0.0)",
+    "llama-cpp-python (>=0.3.8,<0.4.0)",
+    "outlines (>=0.2.3,<0.3.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
