@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 
 from pydantic import BaseModel, StringConstraints, conint
-from typing_extensions import Annotated
+from typing_extensions import Annotated, Optional
 
 from distilabel.models import LlamaCppLLM
 from distilabel.pipeline import Pipeline
@@ -10,28 +10,36 @@ from distilabel.steps import LoadDataFromDicts
 from distilabel.steps.tasks import TextGeneration
 
 
-class Weapon(str, Enum):
-    sword = "sword"
-    axe = "axe"
-    mace = "mace"
-    spear = "spear"
-    bow = "bow"
-    crossbow = "crossbow"
+# class Weapon(str, Enum):
+#     sword = "sword"
+#     axe = "axe"
+#     mace = "mace"
+#     spear = "spear"
+#     bow = "bow"
+#     crossbow = "crossbow"
 
 
-class Armor(str, Enum):
-    leather = "leather"
-    chainmail = "chainmail"
-    plate = "plate"
-    mithril = "mithril"
+# class Armor(str, Enum):
+#     leather = "leather"
+#     chainmail = "chainmail"
+#     plate = "plate"
+#     mithril = "mithril"
 
 
-class Character(BaseModel):
-    name: Annotated[str, StringConstraints(max_length=30)]
-    age: conint(gt=1, lt=3000)
-    armor: Armor
-    weapon: Weapon
+# class Character(BaseModel):
+#     name: Annotated[str, StringConstraints(max_length=30)]
+#     age: conint(gt=1, lt=3000)
+#     armor: Armor
+#     weapon: Weapon
 
+class Contact(BaseModel):
+    name: str
+    email: Optional[str]
+    phone: Optional[str]
+    address: Optional[str]
+    city: Optional[str]
+    state: Optional[str]
+    zip: Optional[str]
 
 # Download the model with
 # curl -L -o ~/Downloads/openhermes-2.5-mistral-7b.Q4_K_M.gguf https://huggingface.co/TheBloke/OpenHermes-2.5-Mistral-7B-GGUF/resolve/main/openhermes-2.5-mistral-7b.Q4_K_M.gguf
@@ -40,8 +48,8 @@ model_path = "Downloads/openhermes-2.5-mistral-7b.Q4_K_M.gguf"
 
 with Pipeline("RPG-characters") as pipeline:
     system_prompt = (
-        "You are a leading role play gamer. You have seen thousands of different characters and their attributes."
-        " Please return a JSON object with common attributes of an RPG character."
+        "You are a contact. You have seen thousands of different people and their attributes."
+        " Please return a JSON object with common attributes of a contact from a CRM."
     )
 
     load_dataset = LoadDataFromDicts(
@@ -49,16 +57,21 @@ with Pipeline("RPG-characters") as pipeline:
         data=[
             {
                 "system_prompt": system_prompt,
-                "instruction": f"Give me a character description for a {char}",
+                "instruction": "Give me a new random contact",
             }
-            for char in ["dwarf", "elf", "human", "ork"]
+            for _ in range(10)
+            # {
+            #     "system_prompt": system_prompt,
+            #     "instruction": f"Give me a character description for a {char}",
+            # }
+            # for char in ["dwarf", "elf", "human", "ork"]
         ],
     )
     llm = LlamaCppLLM(
         model_path=str(Path.home() / model_path),  # type: ignore
         n_gpu_layers=0,  # Disable GPU acceleration
         n_ctx=2048,  # Use a smaller context window
-        structured_output={"format": "json", "schema": Character},
+        structured_output={"format": "json", "schema": Contact},
     )
     # llm = OllamaLLM(
     #     model="qwen2:7b",
